@@ -4,27 +4,30 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Sidebar from './Components/Sidebar';
 import ChatWindow from './Components/ChatWindow';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#3390EC',
-    },
-    background: {
-      default: '#FFFFFF',
-      paper: '#FFFFFF',
-    },
-    text: {
-      primary: '#000000',
-      secondary: '#707579',
-    },
-  },
-});
-
 function App() {
   const [chats, setChats] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const theme = createTheme({
+    palette: {
+      mode: isDarkMode ? 'dark' : 'light',
+      primary: {
+        main: '#3390EC',
+      },
+      background: {
+        default: isDarkMode ? '#0E1621' : '#FFFFFF',
+        paper: isDarkMode ? '#17212B' : '#FFFFFF',
+      },
+      text: {
+        primary: isDarkMode ? '#FFFFFF' : '#000000',
+        secondary: isDarkMode ? '#8E9BA7' : '#707579',
+      },
+    },
+  });
 
   useEffect(() => {
     fetchChats();
@@ -58,19 +61,34 @@ function App() {
     fetchMessages(chat.id);
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="flex h-screen bg-white">
-        {(!isMobile || !selectedChat) && (
-          <Sidebar chats={chats} onChatSelect={handleChatSelect} isMobile={isMobile} />
-        )}
+      <div className={`flex h-screen ${isDarkMode ? 'bg-[#0E1621]' : 'bg-white'}`}>
+        <Sidebar 
+          chats={chats} 
+          onChatSelect={handleChatSelect} 
+          isMobile={isMobile} 
+          isDarkMode={isDarkMode}
+          toggleDarkMode={toggleDarkMode}
+          isMenuOpen={isMenuOpen}
+          toggleMenu={toggleMenu}
+        />
         {(!isMobile || selectedChat) && (
           <ChatWindow
             selectedChat={selectedChat}
             messages={messages}
             isMobile={isMobile}
             onBackClick={() => setSelectedChat(null)}
+            isDarkMode={isDarkMode}
           />
         )}
       </div>
